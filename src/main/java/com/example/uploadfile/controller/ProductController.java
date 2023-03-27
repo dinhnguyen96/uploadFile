@@ -26,11 +26,15 @@ public class ProductController {
     @Autowired
     private IProductService productService;
 
+
     @Autowired
     private Environment environment;
 
+
+
     @GetMapping("/")
-    public ModelAndView index() {
+    public ModelAndView index()
+    {
         ModelAndView modelAndView = new ModelAndView();
         List<Product> products = productService.findAll();
         modelAndView.addObject("products", products);
@@ -87,9 +91,8 @@ public class ProductController {
             }
             try
             {
-                // file duoc upload duoc luu o vi tri nam o phia server
+                //luu file len server
                 String pathFile = environment.getProperty("uploadFileLocation");
-//                 luu file vao server
                 FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
             }
             catch (IOException e)

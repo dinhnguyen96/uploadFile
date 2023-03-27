@@ -4,6 +4,7 @@ import com.example.uploadfile.service.IProductService;
 import com.example.uploadfile.service.impl.ProductServiceImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,7 @@ import java.io.IOException;
 @Configuration
 @EnableWebMvc
 @ComponentScan("com.example.uploadfile")
-@PropertySource("classpath:upload_file.properties") //spring can access path read properties file
+@PropertySource("classpath:upload_file.properties") //spring can access path to read properties file
 public class SpringConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware
 {
 
@@ -70,7 +71,7 @@ public class SpringConfig extends WebMvcConfigurerAdapter implements Application
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
         registry.addResourceHandler("/img/**")
-                .addResourceLocations(environment.getProperty("uploadFileLocation"));
+                .addResourceLocations("file:" + environment.getProperty("uploadFileLocation"));
     }
 
     // Hỗ trợ việc upload file
