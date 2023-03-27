@@ -26,7 +26,6 @@ public class ProductController {
     @Autowired
     private IProductService productService;
 
-
     @Autowired
     private Environment environment;
 
@@ -72,18 +71,6 @@ public class ProductController {
             // lay ten file sau khi upload luu vao database
             String nameFile = multipartFile.getOriginalFilename();
 
-            try
-            {
-                // vi tri file duoc upload luu o phia server
-                String pathFile = environment.getProperty("uploadFileLocation");
-
-//                 luu file vao server
-                FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
-            }
-            catch (IOException e)
-            {
-                System.out.println("Save Error File");
-            }
             Product product = productService.findById(productForm.getId());
 
             if (product == null)
@@ -97,6 +84,17 @@ public class ProductController {
                 product.setDescription(productForm.getDescription());
                 product.setImage(nameFile);
                 productService.update(product.getId(), product);
+            }
+            try
+            {
+                // file duoc upload duoc luu o vi tri nam o phia server
+                String pathFile = environment.getProperty("uploadFileLocation");
+//                 luu file vao server
+                FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
+            }
+            catch (IOException e)
+            {
+                System.out.println("Save Error File");
             }
             return "redirect:/product/";
         }
