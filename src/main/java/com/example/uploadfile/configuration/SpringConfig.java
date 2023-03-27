@@ -27,9 +27,6 @@ import java.io.IOException;
 public class SpringConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware
 {
 
-    @Autowired
-    private Environment environment;
-
     private ApplicationContext applicationContext;
 
     @Override
@@ -71,7 +68,6 @@ public class SpringConfig extends WebMvcConfigurerAdapter implements Application
                 .addResourceLocations("/WEB-INF/image/");
 
     }
-
 
     // Hỗ trợ việc upload file
     @Bean(name = "multipartResolver")
