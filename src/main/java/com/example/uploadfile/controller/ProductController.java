@@ -91,7 +91,7 @@ public class ProductController {
             }
             try
             {
-                //luu file len server
+                //day la duong dan de luu file len server
                 String pathFile = environment.getProperty("uploadFileLocation");
                 FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
             }
