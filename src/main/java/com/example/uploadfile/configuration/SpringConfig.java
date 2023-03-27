@@ -1,5 +1,7 @@
 package com.example.uploadfile.configuration;
 
+import com.example.uploadfile.service.IProductService;
+import com.example.uploadfile.service.impl.ProductServiceImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -23,9 +25,12 @@ import java.io.IOException;
 @Configuration
 @EnableWebMvc
 @ComponentScan("com.example.uploadfile")
-@PropertySource("classpath:upload_file.properties") //spring can access path properties file
+@PropertySource("classpath:upload_file.properties") //spring can access path read properties file
 public class SpringConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware
 {
+
+    @Autowired
+    private Environment environment;
 
     private ApplicationContext applicationContext;
 
@@ -65,8 +70,7 @@ public class SpringConfig extends WebMvcConfigurerAdapter implements Application
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
         registry.addResourceHandler("/img/**")
-                .addResourceLocations("/WEB-INF/image/");
-
+                .addResourceLocations(environment.getProperty("uploadFileLocation"));
     }
 
     // Hỗ trợ việc upload file
@@ -75,5 +79,11 @@ public class SpringConfig extends WebMvcConfigurerAdapter implements Application
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setMaxUploadSizePerFile(52428800);
         return resolver;
+    }
+
+    @Bean
+    public IProductService productService()
+    {
+        return new ProductServiceImpl();
     }
 }

@@ -5,6 +5,7 @@ import com.example.uploadfile.model.ProductForm;
 import com.example.uploadfile.service.IProductService;
 import com.example.uploadfile.service.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -20,17 +22,21 @@ import java.util.List;
 @Controller
 @RequestMapping("/product")
 public class ProductController {
-    private final IProductService productService = new ProductServiceImpl();
+
+    @Autowired
+    private IProductService productService;
 
 
     @Autowired
     private Environment environment;
 
     @GetMapping("/")
-    public String index(Model model) {
+    public ModelAndView index() {
+        ModelAndView modelAndView = new ModelAndView();
         List<Product> products = productService.findAll();
-        model.addAttribute("products", products);
-        return "/index";
+        modelAndView.addObject("products", products);
+        modelAndView.setViewName("/index");
+        return modelAndView;
     }
 
     @GetMapping("/edit/{id}")
@@ -56,9 +62,8 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    public ModelAndView saveProduct(@ModelAttribute("productForm") ProductForm productForm)
+    public String saveProduct(@ModelAttribute("productForm") ProductForm productForm, HttpServletRequest request)
     {
-        ModelAndView modelAndView = new ModelAndView();
         // lấy hình ảnh từ phía client lên server
         MultipartFile multipartFile = productForm.getImage();
 
@@ -67,9 +72,18 @@ public class ProductController {
             // lay ten file sau khi upload luu vao database
             String nameFile = multipartFile.getOriginalFilename();
 
-            // vi tri file duoc upload luu o phia server
-            String pathFile = environment.getProperty("uploadFileLocation");
+            try
+            {
+                // vi tri file duoc upload luu o phia server
+                String pathFile = environment.getProperty("uploadFileLocation");
 
+//                 luu file vao server
+                FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
+            }
+            catch (IOException e)
+            {
+                System.out.println("Save Error File");
+            }
             Product product = productService.findById(productForm.getId());
 
             if (product == null)
@@ -84,25 +98,8 @@ public class ProductController {
                 product.setImage(nameFile);
                 productService.update(product.getId(), product);
             }
-            try
-            {
-//                 luu file vao server
-                FileCopyUtils.copy(multipartFile.getBytes(), new File(pathFile+nameFile));
-            }
-            catch (IOException e)
-            {
-                System.out.println("Save Error File");
-            }
-            List<Product> products = productService.findAll();
-            modelAndView.addObject("products", products);
-            modelAndView.setViewName("/index");
+            return "redirect:/product/";
         }
-        else
-        {
-            modelAndView.setViewName("/edit");
-        }
-        return modelAndView;
-
-
+        return "/edit";
     }
 }
